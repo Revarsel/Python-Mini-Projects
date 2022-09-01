@@ -1,0 +1,115 @@
+import pygame
+import random
+import math as m
+
+height = 1040
+width = 1920
+red = (255, 0, 0)
+FPS = 60
+x = random.randint(0,1000)
+y = random.randint(0,1000)
+vx = random.randint(0,0)
+vy = random.randint(0,0)
+colors = [(0,0,255), (0,255,0), (255,0,0)]
+rect1 = ()
+global rect2 
+
+screen = pygame.display.set_mode((width, height))
+
+pygame.display.set_caption("Gaem")
+
+class mass():
+    def __init__(self):
+        self.posx = width/2
+        self.posy = height/2
+    
+    def draw(self):
+        global rect2
+        rect2 = pygame.Rect(self.posx-75, self.posy-50, 100, 100)
+        pygame.draw.rect(screen, (150, 0, 0), rect2)
+
+class particle():
+    def __init__(self, posx, posy, velx, vely):
+        global x
+        global y
+        global vx
+        global vy
+        ahush = (165,190,230)
+        self.posx = x
+        self.posy = y
+        self.velx = vx
+        self.vely = vy
+        self.color = random.choice(colors)
+        self.height = 10
+        self.width = self.height 
+
+    def draw(self):
+        global rect1
+        rect1 = (self.posx - 5, self.posy - 5, self.height, self.width)
+        #pygame.draw.rect(screen, self.color, rectangle, 3)
+        pygame.draw.circle(screen, self.color, (self.posx, self.posy), 5)
+
+def main():
+    clock = pygame.time.Clock()
+    run = True
+    Mass = mass()
+    particles = [Mass]
+    yesorno = True
+    while run:
+        clock.tick(FPS)
+        screen.fill((0,10,10))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        if yesorno ==True:
+            global x
+            global y
+            global vx
+            global vy
+            for i in range(0,2):
+                particles.append(particle(x, y, vx ,vy))
+                x = random.randint(10,width)
+                y = random.randint(10,height)
+                vx = random.randint(0, 0)
+                vy = random.randint(0, 0)
+            yesorno = False
+        for a in particles:
+            global rect1
+            global rect2
+            fx = 0
+            fy = 0
+            g = 0.001
+            if a == Mass:
+                continue
+            for t in particles:
+                dx = t.posx - a.posx 
+                dy = t.posy - a.posy 
+                d = m.sqrt((dx*dx) + (dy*dy))
+                if d > 0:
+                    if t == Mass:
+                        f = (g*2 * 1/d)
+                        fx += (f * dx)
+                        fy += (f * dy)
+                    else:
+                        f = (g * 1/d)
+                        fx += (f * dx)
+                        fy += (f * dy)
+                a.velx = (a.velx + fx) * 1
+                a.vely = (a.vely + fy) * 1
+                a.posx += a.velx 
+                a.posy += a.vely 
+                if a.posx >= width or a.posx <= 0:
+                    a.velx *= -1
+                if a.posy >= height or a.posy <= 0:
+                    a.vely *= -1
+                a.draw()
+        
+        Mass.draw()
+
+        pygame.display.update()
+        
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
